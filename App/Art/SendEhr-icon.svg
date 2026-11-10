@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later
+     Copyright (C) 2026 Amrit Rosell. Part of SendEhr. -->
+<!-- App icon master: 2000 x 2000, black rounded square (rx 440), white 载 (zai, "load").
+     The glyph is hand-drawn: one centre line per brush stroke on a 1000 x 1000 grid (y down),
+     one stroke width (82), flat caps, mitre joins. Edit the lines to redraw it.
+     scripts/build-icon.sh renders this file. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000"><rect x="0" y="0" width="2000" height="2000" rx="440" ry="440" fill="#000000"/><g transform="translate(84.07,108.54) scale(1.76915)" fill="none" stroke="#ffffff" stroke-width="82" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="2"><path d="M60,170L440,170"/><path d="M250,30L250,285"/><path d="M30,335L900,335"/><path d="M80,490L500,490"/><path d="M280,452L145,655L480,655"/><path d="M305,655L305,990"/><path d="M50,850L505,790"/><path d="M545,20Q575,640 935,950L965,770"/><path d="M870,500L585,925"/><path d="M735,50L830,175"/></g></svg>

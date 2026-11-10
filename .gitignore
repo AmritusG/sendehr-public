@@ -1,0 +1,11 @@
+.DS_Store
+.build/
+.swiftpm/
+build/
+DerivedData/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+App/SendEhr.xcodeproj/
+Package.resolved
+.dist/
+__pycache__/

@@ -1,0 +1,74 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Copyright (C) 2026 Amrit Rosell
+#
+# This file is part of SendEhr.
+#
+# SendEhr is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# SendEhr is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along
+# with SendEhr.  If not, see <https://www.gnu.org/licenses/>.
+
+name: SendEhr
+options:
+  bundleIdPrefix: com.amritus
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+packages:
+  SendEhrKit:
+    path: ..
+settings:
+  base:
+    DEVELOPMENT_TEAM: 3A3L2C6DFB
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "Developer ID Application"
+    ENABLE_HARDENED_RUNTIME: YES
+    MARKETING_VERSION: 1.1.0
+    CURRENT_PROJECT_VERSION: 1
+    SWIFT_VERSION: "5.0"
+    OTHER_CODE_SIGN_FLAGS: "--timestamp"
+    CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO   # no get-task-allow in shipped builds
+targets:
+  SendEhr:
+    type: application
+    platform: macOS
+    sources: [SendEhr]
+    dependencies:
+      - package: SendEhrKit
+        product: SendEhrKit
+      - package: SendEhrKit
+        product: SendEhrKitUI
+      - target: SendEhrFinderSync
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.amritus.sendehr
+        PRODUCT_NAME: SendEhr
+        INFOPLIST_FILE: SendEhr/Info.plist
+        CODE_SIGN_ENTITLEMENTS: SendEhr/SendEhr.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+  SendEhrFinderSync:
+    type: app-extension
+    platform: macOS
+    sources: [FinderSync]
+    dependencies:
+      - package: SendEhrKit
+        product: SendEhrKit
+      - package: SendEhrKit
+        product: SendEhrKitUI
+      - sdk: FinderSync.framework
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.amritus.sendehr.findersync
+        PRODUCT_NAME: SendEhrFinderSync
+        INFOPLIST_FILE: FinderSync/Info.plist
+        CODE_SIGN_ENTITLEMENTS: FinderSync/FinderSync.entitlements
+        GENERATE_INFOPLIST_FILE: NO
