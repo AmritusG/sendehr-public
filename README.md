@@ -59,7 +59,7 @@ The project signs with the Developer ID team in `App/project.yml` and an App Gro
 The Arena logic is the Swift package **SendEhrKit** in this repository (products `SendEhrKit`, Foundation only, and `SendEhrKitUI`, AppKit/SwiftUI menus), usable from other apps:
 
 ```swift
-.package(url: "https://github.com/AmritusG/sendehr-public.git", exact: "1.1.0")
+.package(url: "https://github.com/AmritusG/sendehr-public.git", exact: "1.1.1")
 // SwiftUI: SendToArenaMenu(controller: .shared, urls: selectedURLs)
 ```
 

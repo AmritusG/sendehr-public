@@ -46,9 +46,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var settingsRenderer = SendMenuRenderer()
 
     func applicationDidFinishLaunching(_ note: Notification) {
-        let migrated = LegacyMigration.migrateAppGroup(home: FileManager.default.homeDirectoryForCurrentUser) {
-            FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: $0)
-        }
         guard let store = SharedStore.appGroupStore() else {
             let a = NSAlert()
             a.messageText = "SendEhr cannot open its App Group container"
@@ -63,7 +60,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         controller.log.mirror(to: FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Logs/SendEhr/SendEhr.log"))
         controller.log.add("SendEhr \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") ?? "") launched, pid \(getpid())")
-        if let migrated { controller.log.add(migrated) }
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         statusItem.button?.image = NSImage(systemSymbolName: "square.grid.3x3.fill", accessibilityDescription: "SendEhr")

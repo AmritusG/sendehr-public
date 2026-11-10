@@ -23,7 +23,7 @@ import PackageDescription
 // SendEhrKit: the "Send to Arena" logic for Resolume Arena, shared by SendEhr
 // (Finder Sync extension + menu bar host) and other hosts such as MaCrate.
 // Consume by URL + tag, e.g.
-//   .package(url: "https://github.com/AmritusG/sendehr-public.git", exact: "1.1.0")
+//   .package(url: "https://github.com/AmritusG/sendehr-public.git", exact: "1.1.1")
 //
 // The test target is declared only where Tests/ exists (the public source
 // tree ships without tests).

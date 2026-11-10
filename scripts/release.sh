@@ -17,7 +17,8 @@
 # You should have received a copy of the GNU General Public License along
 # with SendEhr.  If not, see <https://www.gnu.org/licenses/>.
 #
-# Distribution build of SendEhr: Release build -> verify signature ->
+# Distribution build of SendEhr: Release build (stripped, dSYMs kept aside)
+# -> check that no binary holds a build-machine path -> verify signature ->
 # notarise the app -> staple -> styled DMG (app + /Applications link, window
 # layout and background via dmgbuild) -> sign DMG ->
 # notarise the DMG -> staple -> verify -> SHA-256.
@@ -29,6 +30,8 @@
 #   dd/                 Xcode derived data
 #   SendEhr.app         the stapled app
 #   SendEhr-<v>.dmg     the stapled DMG, plus .sha256
+#   dSYM/               the dSYMs of the shipped binaries (not shipped; keep them
+#                       to symbolicate crash reports: same build UUID)
 #   notary-*.json       notarytool submit results and logs
 # and ../venv-dmg (dmgbuild, installed once from scripts/dmg-requirements.txt,
 # pinned by hash).
@@ -83,13 +86,38 @@ notarise() {
 echo "==> Build (Release)"
 cd "$ROOT/App"
 xcodegen generate -q
+# Release strips the app and the extension (App/project.yml, configs: Release);
+# the check below fails the release if a build-machine path is left.
 xcodebuild -project SendEhr.xcodeproj -scheme SendEhr -configuration Release \
     -derivedDataPath "$DD" clean build 2>&1 | grep -E "error:|BUILD (SUCCEEDED|FAILED)" || true
-BUILT="$DD/Build/Products/Release/SendEhr.app"
+PRODUCTS="$DD/Build/Products/Release"
+BUILT="$PRODUCTS/SendEhr.app"
 [[ -d "$BUILT" ]] || { echo "build failed"; exit 1; }
 cd "$ROOT"
 ditto "$BUILT" "$APP"
 unregister "$BUILT"
+mkdir -p "$OUT/dSYM"
+ditto "$PRODUCTS/SendEhr.app.dSYM" "$OUT/dSYM/SendEhr.app.dSYM"
+ditto "$PRODUCTS/SendEhrFinderSync.appex.dSYM" "$OUT/dSYM/SendEhrFinderSync.appex.dSYM"
+
+echo "==> Build-machine path check"
+# Every Mach-O in the app: no absolute build path, no user or home name, no
+# build folder (grep -a reads the raw bytes, strings(1) misses some).
+FORBIDDEN=(/Users/ /private/ /var/folders/ /tmp/ .build/ .dist/ DerivedData "$USER" "$ROOT")
+DSYM_UUIDS=$(dwarfdump --uuid "$OUT"/dSYM/*.dSYM | awk '{print $2}')
+machos=0
+while IFS= read -r -d '' f; do
+    file -b "$f" | grep -q "Mach-O" || continue
+    machos=$((machos + 1))
+    for p in $FORBIDDEN; do
+        if LC_ALL=C grep -a -q -F -- "$p" "$f"; then echo "found '$p' in ${f#$APP/}"; exit 1; fi
+    done
+    dwarfdump --uuid "$f" | awk '{print $2}' | while read -r uuid; do
+        print -r -- "$DSYM_UUIDS" | grep -qx "$uuid" || { echo "no dSYM for $uuid (${f#$APP/})"; exit 1; }
+    done
+done < <(find "$APP" -type f -print0)
+(( machos > 0 )) || { echo "no Mach-O found"; exit 1; }
+echo "    $machos Mach-O files clean, dSYM UUIDs match"
 
 echo "==> Signature checks"
 codesign --verify --deep --strict --verbose=2 "$APP"

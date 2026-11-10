@@ -27,11 +27,9 @@ public final class SendToArenaController: ObservableObject {
     /// Default instance storing settings under ~/Library/Application Support/SendEhrKit/<bundle id>.
     public static let shared: SendToArenaController = {
         let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        let dirs = LegacyMigration.kitFolders(applicationSupport: support, bundleID: Bundle.main.bundleIdentifier ?? "app")
-        let migrated = LegacyMigration.migrate(from: dirs.old, to: dirs.new)
-        let controller = SendToArenaController(shared: SharedStore(root: dirs.new))
-        if let migrated { controller.log.add(migrated) }
-        return controller
+        let root = support.appendingPathComponent(SharedStore.kitFolder, isDirectory: true)
+            .appendingPathComponent(Bundle.main.bundleIdentifier ?? "app", isDirectory: true)
+        return SendToArenaController(shared: SharedStore(root: root))
     }()
 
     nonisolated public static let arenaBundleID = "com.resolume.arena"
